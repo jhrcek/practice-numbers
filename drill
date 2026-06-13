@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Number-listening drill: pick a random number 0..LIMIT-1, show it, wait for
+# Enter, then play its pre-generated pronunciation mp3. Loops until Ctrl+C.
+# Run from the directory containing 0.mp3 .. 9999.mp3 (or it falls back to the
+# script's own directory).
+set -uo pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: drill LIMIT" >&2
+  exit 1
+fi
+
+LIMIT=$1
+if (( LIMIT > 10000 )); then
+  echo "number too high" >&2
+  exit 1
+fi
+
+# Play files from the current directory; if there are no mp3s here, fall back
+# to the directory the script itself lives in.
+dir=.
+if ! ls ./*.mp3 >/dev/null 2>&1; then
+  dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+fi
+
+trap 'echo; exit 0' INT
+
+while true; do
+  n=$((RANDOM % LIMIT))
+  echo "$n"
+  read -rp "Enter to continue"
+  mplayer -really-quiet "$dir/$n.mp3" >/dev/null 2>&1
+done

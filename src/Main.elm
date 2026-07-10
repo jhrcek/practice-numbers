@@ -592,39 +592,46 @@ viewPhase s =
                     []
                 , button [ E.onClick AnswerSubmitted ] [ text "Check" ]
                 ]
-            , button [ E.onClick ReplayClicked ] [ text "🔊 Play again" ]
+            , replayRow
             ]
 
         ListenVerdict { given, wasCorrect } ->
-            [ p [ A.class "big-number" ]
+            [ p []
                 (if wasCorrect then
-                    [ text given, span [ A.class "ok" ] [ text " ✓" ] ]
+                    [ span [ A.class "ok" ] [ text "✓ Correct!" ] ]
 
                  else
-                    [ text given
-                    , span [ A.class "bad" ] [ text " ✗" ]
-                    , span [ A.class "note" ] [ text (" correct was " ++ String.fromInt s.current) ]
+                    [ span [ A.class "bad" ] [ text "✗ Wrong" ]
+                    , span [ A.class "note" ] [ text (" — correct was " ++ String.fromInt s.current) ]
                     ]
                 )
-            , button [ A.id nextButtonId, E.onClick NextClicked ] [ text "Next ⏎" ]
-            , button [ E.onClick ReplayClicked ] [ text "🔊 Play again" ]
+            , div []
+                [ input [ A.type_ "text", A.value given, A.readonly True ] []
+                , button [ A.id nextButtonId, E.onClick NextClicked ] [ text "Next ⏎" ]
+                ]
+            , replayRow
             ]
 
         SpeakThinking ->
             [ p [] [ text "Say this number out loud in Portuguese:" ]
             , p [ A.class "big-number" ] [ text (String.fromInt s.current) ]
-            , button [ A.id playButtonId, E.onClick RevealClicked ] [ text "🔊 Hear it ⏎" ]
+            , div [] [ button [ A.id playButtonId, E.onClick RevealClicked ] [ text "🔊 Hear it ⏎" ] ]
             ]
 
         SpeakEvaluating ->
-            [ p [ A.class "big-number" ] [ text (String.fromInt s.current) ]
-            , button [ E.onClick ReplayClicked ] [ text "🔊 Play again" ]
-            , p [] [ text "How did it go?" ]
+            [ p [] [ text "How did it go?" ]
+            , p [ A.class "big-number" ] [ text (String.fromInt s.current) ]
             , div []
                 [ button [ E.onClick (SelfEvaluated True) ] [ text "✓ I said it right (1)" ]
                 , button [ E.onClick (SelfEvaluated False) ] [ text "✗ I made a mistake (2)" ]
                 ]
+            , replayRow
             ]
+
+
+replayRow : Html Msg
+replayRow =
+    div [] [ button [ E.onClick ReplayClicked ] [ text "🔊 Play again" ] ]
 
 
 viewResults : Session -> List (Html Msg)

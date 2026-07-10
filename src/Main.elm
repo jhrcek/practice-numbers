@@ -8,6 +8,10 @@ port module Main exposing (main)
 --           compare, then self-evaluates.
 -- Audio playback goes through a port (see index.html); mp3s named
 -- 0.mp3 .. 9999.mp3 live in the audio/ directory next to index.html.
+--
+-- Each answer is timed from question start until the user commits
+-- (Check in listen mode, Hear it in speak mode); the results screen
+-- shows the average over all attempts, correct and wrong alike.
 
 import Browser
 import Browser.Dom as Dom
@@ -18,6 +22,7 @@ import Html.Events as E
 import Json.Decode as Decode
 import Random
 import Task
+import Time
 
 
 port playAudio : String -> Cmd msg
@@ -79,6 +84,8 @@ type alias Session =
     , wrong : Int
     , current : Int
     , phase : Phase
+    , questionStart : Maybe Time.Posix
+    , answerMillis : List Int
     }
 
 
@@ -120,6 +127,8 @@ type Msg
     | StartClicked
       -- session
     | GotNumber Int
+    | GotStartTime Time.Posix
+    | GotAnswerTime Time.Posix
     | AnswerChanged String
     | AnswerSubmitted
     | ReplayClicked
@@ -173,10 +182,30 @@ update msg model =
                     in
                     case s.mode of
                         Listen ->
-                            ( InSession s2, Cmd.batch [ playAudio (mp3Url n), focus answerInputId ] )
+                            ( InSession s2, Cmd.batch [ playAudio (mp3Url n), focus answerInputId, now GotStartTime ] )
 
                         Speak ->
-                            ( InSession s2, focus playButtonId )
+                            ( InSession s2, Cmd.batch [ focus playButtonId, now GotStartTime ] )
+                )
+
+        GotStartTime t ->
+            withSession model (\s -> ( InSession { s | questionStart = Just t }, Cmd.none ))
+
+        GotAnswerTime t ->
+            withSession model
+                (\s ->
+                    case s.questionStart of
+                        Just start ->
+                            ( InSession
+                                { s
+                                    | answerMillis = (Time.posixToMillis t - Time.posixToMillis start) :: s.answerMillis
+                                    , questionStart = Nothing
+                                }
+                            , Cmd.none
+                            )
+
+                        Nothing ->
+                            ( InSession s, Cmd.none )
                 )
 
         AnswerChanged v ->
@@ -210,7 +239,7 @@ update msg model =
                                     s2 =
                                         tally good { s | phase = ListenVerdict { given = answer, wasCorrect = good } }
                                 in
-                                ( InSession s2, focus nextButtonId )
+                                ( InSession s2, Cmd.batch [ focus nextButtonId, now GotAnswerTime ] )
 
                         _ ->
                             ( InSession s, Cmd.none )
@@ -227,7 +256,9 @@ update msg model =
                 (\s ->
                     case s.phase of
                         SpeakThinking ->
-                            ( InSession { s | phase = SpeakEvaluating }, playAudio (mp3Url s.current) )
+                            ( InSession { s | phase = SpeakEvaluating }
+                            , Cmd.batch [ playAudio (mp3Url s.current), now GotAnswerTime ]
+                            )
 
                         _ ->
                             ( InSession s, Cmd.none )
@@ -249,7 +280,7 @@ update msg model =
                 Finished s ->
                     let
                         fresh =
-                            { s | correct = 0, wrong = 0, phase = Loading }
+                            { s | correct = 0, wrong = 0, phase = Loading, questionStart = Nothing, answerMillis = [] }
                     in
                     ( { model | screen = InSession fresh }, roll fresh )
 
@@ -303,6 +334,8 @@ validate form =
                     , wrong = 0
                     , current = 0
                     , phase = Loading
+                    , questionStart = Nothing
+                    , answerMillis = []
                     }
 
         _ ->
@@ -360,6 +393,11 @@ mp3Url n =
 focus : String -> Cmd Msg
 focus id =
     Task.attempt (\_ -> NoOp) (Dom.focus id)
+
+
+now : (Time.Posix -> Msg) -> Cmd Msg
+now toMsg =
+    Task.perform toMsg Time.now
 
 
 answerInputId : String
@@ -594,6 +632,7 @@ viewResults s =
     [ h1 [] [ text "Session complete" ]
     , p [] [ text (summaryText s) ]
     , p [] [ text (accuracyText s) ]
+    , p [] [ text (averageTimeText s) ]
     , div []
         [ button [ E.onClick RestartClicked ] [ text "Practice again" ]
         , button [ E.onClick ChangeSettingsClicked ] [ text "Change settings" ]
@@ -630,6 +669,24 @@ accuracyText s =
 
     else
         "Accuracy: " ++ String.fromInt (round (100 * toFloat s.correct / toFloat total)) ++ "%"
+
+
+averageTimeText : Session -> String
+averageTimeText s =
+    case s.answerMillis of
+        [] ->
+            ""
+
+        times ->
+            let
+                tenths =
+                    round (toFloat (List.sum times) / toFloat (List.length times) / 100)
+            in
+            "Average time per answer: "
+                ++ String.fromInt (tenths // 10)
+                ++ "."
+                ++ String.fromInt (remainderBy 10 tenths)
+                ++ " s"
 
 
 onEnter : Msg -> Html.Attribute Msg

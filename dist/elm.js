@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.X.L === region.ab.L)
+	if (region.Z.N === region.ad.N)
 	{
-		return 'on line ' + region.X.L;
+		return 'on line ' + region.Z.N;
 	}
-	return 'on lines ' + region.X.L + ' through ' + region.ab.L;
+	return 'on lines ' + region.Z.N + ' through ' + region.ad.N;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
+		impl.aM,
+		impl.aU,
 		impl.aS,
-		impl.aQ,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		v: func(record.v),
-		Y: record.Y,
-		V: record.V
+		_: record._,
+		X: record.X
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.v;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Y;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value._;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.V) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.X) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
+		impl.aM,
+		impl.aU,
 		impl.aS,
-		impl.aQ,
 		function(sendToApp, initialModel) {
-			var view = impl.aT;
+			var view = impl.aV;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
+		impl.aM,
+		impl.aU,
 		impl.aS,
-		impl.aQ,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.W && impl.W(sendToApp)
-			var view = impl.aT;
+			var divertHrefToApp = impl.Y && impl.Y(sendToApp)
+			var view = impl.aV;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aD);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aF);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.aR) && (_VirtualDom_doc.title = title = doc.aR);
+				(title !== doc.aT) && (_VirtualDom_doc.title = title = doc.aT);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aM;
-	var onUrlRequest = impl.aN;
+	var onUrlChange = impl.aO;
+	var onUrlRequest = impl.aP;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		W: function(sendToApp)
+		Y: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ap === next.ap
-							&& curr.ag === next.ag
-							&& curr.am.a === next.am.a
+							&& curr.ar === next.ar
+							&& curr.ai === next.ai
+							&& curr.ao.a === next.ao.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aK: function(flags)
+		aM: function(flags)
 		{
-			return A3(impl.aK, flags, _Browser_getUrl(), key);
+			return A3(impl.aM, flags, _Browser_getUrl(), key);
 		},
-		aT: impl.aT,
-		aS: impl.aS,
-		aQ: impl.aQ
+		aV: impl.aV,
+		aU: impl.aU,
+		aS: impl.aS
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aI: 'hidden', aE: 'visibilitychange' }
+		? { aK: 'hidden', aG: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aI: 'mozHidden', aE: 'mozvisibilitychange' }
+		? { aK: 'mozHidden', aG: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aI: 'msHidden', aE: 'msvisibilitychange' }
+		? { aK: 'msHidden', aG: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aI: 'webkitHidden', aE: 'webkitvisibilitychange' }
-		: { aI: 'hidden', aE: 'visibilitychange' };
+		? { aK: 'webkitHidden', aG: 'webkitvisibilitychange' }
+		: { aK: 'hidden', aG: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		at: _Browser_getScene(),
-		aw: {
-			az: _Browser_window.pageXOffset,
-			aA: _Browser_window.pageYOffset,
-			ay: _Browser_doc.documentElement.clientWidth,
-			af: _Browser_doc.documentElement.clientHeight
+		av: _Browser_getScene(),
+		ay: {
+			aB: _Browser_window.pageXOffset,
+			aC: _Browser_window.pageYOffset,
+			aA: _Browser_doc.documentElement.clientWidth,
+			ah: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		ay: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		af: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aA: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ah: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			at: {
-				ay: node.scrollWidth,
-				af: node.scrollHeight
+			av: {
+				aA: node.scrollWidth,
+				ah: node.scrollHeight
 			},
-			aw: {
-				az: node.scrollLeft,
-				aA: node.scrollTop,
-				ay: node.clientWidth,
-				af: node.clientHeight
+			ay: {
+				aB: node.scrollLeft,
+				aC: node.scrollTop,
+				aA: node.clientWidth,
+				ah: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			at: _Browser_getScene(),
-			aw: {
-				az: x,
-				aA: y,
-				ay: _Browser_doc.documentElement.clientWidth,
-				af: _Browser_doc.documentElement.clientHeight
+			av: _Browser_getScene(),
+			ay: {
+				aB: x,
+				aC: y,
+				aA: _Browser_doc.documentElement.clientWidth,
+				ah: _Browser_doc.documentElement.clientHeight
 			},
-			aG: {
-				az: x + rect.left,
-				aA: y + rect.top,
-				ay: rect.width,
-				af: rect.height
+			aI: {
+				aB: x + rect.left,
+				aC: y + rect.top,
+				aA: rect.width,
+				ah: rect.height
 			}
 		};
 	});
@@ -4957,7 +4957,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ad: fragment, ag: host, ak: path, am: port_, ap: protocol, aq: query};
+		return {af: fragment, ai: host, am: path, ao: port_, ar: protocol, as: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5240,13 +5240,13 @@ var $author$project$Main$Listen = 0;
 var $author$project$Main$ReachCorrect = 0;
 var $author$project$Main$Setup = {$: 0};
 var $author$project$Main$initModel = {
-	E: {Q: $elm$core$Maybe$Nothing, K: '10', k: 0, F: '99', G: '0', m: 0},
+	F: {S: $elm$core$Maybe$Nothing, M: '10', k: 0, G: '99', H: '0', m: 0},
 	q: $author$project$Main$Setup
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$SelfEvaluated = function (a) {
-	return {$: 14, a: a};
+	return {$: 16, a: a};
 };
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$fail = _Json_fail;
@@ -5260,7 +5260,7 @@ var $elm$browser$Browser$Events$MySub = F3(
 	});
 var $elm$browser$Browser$Events$State = F2(
 	function (subs, pids) {
-		return {al: pids, au: subs};
+		return {an: pids, aw: subs};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5492,7 +5492,7 @@ var $elm$core$Dict$merge = F6(
 	});
 var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
-		return {ac: event, ah: key};
+		return {ae: event, aj: key};
 	});
 var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$browser$Browser$Events$spawn = F3(
@@ -5567,7 +5567,7 @@ var $elm$browser$Browser$Events$onEffects = F3(
 			stepLeft,
 			stepBoth,
 			stepRight,
-			state.al,
+			state.an,
 			$elm$core$Dict$fromList(newSubs),
 			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
 		var deadPids = _v0.a;
@@ -5613,8 +5613,8 @@ var $elm$core$List$filterMap = F2(
 	});
 var $elm$browser$Browser$Events$onSelfMsg = F3(
 	function (router, _v0, state) {
-		var key = _v0.ah;
-		var event = _v0.ac;
+		var key = _v0.aj;
+		var event = _v0.ae;
 		var toMessage = function (_v2) {
 			var subKey = _v2.a;
 			var _v3 = _v2.b;
@@ -5623,7 +5623,7 @@ var $elm$browser$Browser$Events$onSelfMsg = F3(
 			var decoder = _v3.c;
 			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
 		};
-		var messages = A2($elm$core$List$filterMap, toMessage, state.au);
+		var messages = A2($elm$core$List$filterMap, toMessage, state.aw);
 		return A2(
 			$elm$core$Task$andThen,
 			function (_v1) {
@@ -5683,6 +5683,12 @@ var $author$project$Main$subscriptions = function (model) {
 	} else {
 		return $elm$core$Platform$Sub$none;
 	}
+};
+var $author$project$Main$GotAnswerTime = function (a) {
+	return {$: 10, a: a};
+};
+var $author$project$Main$GotStartTime = function (a) {
+	return {$: 9, a: a};
 };
 var $author$project$Main$InSession = function (a) {
 	return {$: 1, a: a};
@@ -5844,7 +5850,7 @@ var $author$project$Main$roll = function (s) {
 	return A2(
 		$elm$random$Random$generate,
 		$author$project$Main$GotNumber,
-		A2($elm$random$Random$int, s.S, s.R));
+		A2($elm$random$Random$int, s.U, s.T));
 };
 var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$Main$sessionDone = function (s) {
@@ -5903,6 +5909,9 @@ var $author$project$Main$mp3Url = function (n) {
 	return 'audio/' + ($elm$core$String$fromInt(n) + '.mp3');
 };
 var $author$project$Main$nextButtonId = 'next-button';
+var $author$project$Main$now = function (toMsg) {
+	return A2($elm$core$Task$perform, toMsg, $elm$time$Time$now);
+};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$playAudio = _Platform_outgoingPort('playAudio', $elm$json$Json$Encode$string);
 var $author$project$Main$playButtonId = 'play-button';
@@ -5929,24 +5938,24 @@ var $author$project$Main$updateForm = F2(
 			_Utils_update(
 				model,
 				{
-					E: f(model.E)
+					F: f(model.F)
 				}),
 			$elm$core$Platform$Cmd$none);
 	});
 var $author$project$Main$validate = function (form) {
 	var _v0 = _Utils_Tuple3(
 		$elm$core$String$toInt(
+			$elm$core$String$trim(form.H)),
+		$elm$core$String$toInt(
 			$elm$core$String$trim(form.G)),
 		$elm$core$String$toInt(
-			$elm$core$String$trim(form.F)),
-		$elm$core$String$toInt(
-			$elm$core$String$trim(form.K)));
+			$elm$core$String$trim(form.M)));
 	if (((!_v0.a.$) && (!_v0.b.$)) && (!_v0.c.$)) {
 		var lo = _v0.a.a;
 		var hi = _v0.b.a;
 		var goal = _v0.c.a;
 		return ((lo < 0) || (hi > 9999)) ? $elm$core$Result$Err('Range must stay between 0 and 9999 (that\'s all the recordings we have).') : ((_Utils_cmp(lo, hi) > 0) ? $elm$core$Result$Err('Range: \'from\' must not exceed \'to\'.') : ((goal < 1) ? $elm$core$Result$Err('The goal must be at least 1.') : $elm$core$Result$Ok(
-			{f: 0, r: 0, k: form.k, z: goal, m: form.m, g: $author$project$Main$Loading, R: hi, S: lo, n: 0})));
+			{D: _List_Nil, f: 0, r: 0, k: form.k, z: goal, m: form.m, g: $author$project$Main$Loading, I: $elm$core$Maybe$Nothing, T: hi, U: lo, n: 0})));
 	} else {
 		return $elm$core$Result$Err('Please fill in all fields with whole numbers.');
 	}
@@ -5990,7 +5999,7 @@ var $author$project$Main$update = F2(
 					function (f) {
 						return _Utils_update(
 							f,
-							{G: v});
+							{H: v});
 					},
 					model);
 			case 3:
@@ -6000,7 +6009,7 @@ var $author$project$Main$update = F2(
 					function (f) {
 						return _Utils_update(
 							f,
-							{F: v});
+							{G: v});
 					},
 					model);
 			case 4:
@@ -6012,8 +6021,8 @@ var $author$project$Main$update = F2(
 						return _Utils_update(
 							f,
 							{
-								F: $elm$core$String$fromInt(hi),
-								G: $elm$core$String$fromInt(lo)
+								G: $elm$core$String$fromInt(hi),
+								H: $elm$core$String$fromInt(lo)
 							});
 					},
 					model);
@@ -6034,11 +6043,11 @@ var $author$project$Main$update = F2(
 					function (f) {
 						return _Utils_update(
 							f,
-							{K: v});
+							{M: v});
 					},
 					model);
 			case 7:
-				var _v1 = $author$project$Main$validate(model.E);
+				var _v1 = $author$project$Main$validate(model.F);
 				if (!_v1.$) {
 					var session = _v1.a;
 					return _Utils_Tuple2(
@@ -6056,7 +6065,7 @@ var $author$project$Main$update = F2(
 							return _Utils_update(
 								f,
 								{
-									Q: $elm$core$Maybe$Just(e)
+									S: $elm$core$Maybe$Just(e)
 								});
 						},
 						model);
@@ -6082,22 +6091,70 @@ var $author$project$Main$update = F2(
 										[
 											$author$project$Main$playAudio(
 											$author$project$Main$mp3Url(n)),
-											$author$project$Main$focus($author$project$Main$answerInputId)
+											$author$project$Main$focus($author$project$Main$answerInputId),
+											$author$project$Main$now($author$project$Main$GotStartTime)
 										])));
 						} else {
 							return _Utils_Tuple2(
 								$author$project$Main$InSession(s2),
-								$author$project$Main$focus($author$project$Main$playButtonId));
+								$elm$core$Platform$Cmd$batch(
+									_List_fromArray(
+										[
+											$author$project$Main$focus($author$project$Main$playButtonId),
+											$author$project$Main$now($author$project$Main$GotStartTime)
+										])));
 						}
 					});
 			case 9:
+				var t = msg.a;
+				return A2(
+					$author$project$Main$withSession,
+					model,
+					function (s) {
+						return _Utils_Tuple2(
+							$author$project$Main$InSession(
+								_Utils_update(
+									s,
+									{
+										I: $elm$core$Maybe$Just(t)
+									})),
+							$elm$core$Platform$Cmd$none);
+					});
+			case 10:
+				var t = msg.a;
+				return A2(
+					$author$project$Main$withSession,
+					model,
+					function (s) {
+						var _v3 = s.I;
+						if (!_v3.$) {
+							var start = _v3.a;
+							return _Utils_Tuple2(
+								$author$project$Main$InSession(
+									_Utils_update(
+										s,
+										{
+											D: A2(
+												$elm$core$List$cons,
+												$elm$time$Time$posixToMillis(t) - $elm$time$Time$posixToMillis(start),
+												s.D),
+											I: $elm$core$Maybe$Nothing
+										})),
+								$elm$core$Platform$Cmd$none);
+						} else {
+							return _Utils_Tuple2(
+								$author$project$Main$InSession(s),
+								$elm$core$Platform$Cmd$none);
+						}
+					});
+			case 11:
 				var v = msg.a;
 				return A2(
 					$author$project$Main$withSession,
 					model,
 					function (s) {
-						var _v3 = s.g;
-						if (_v3.$ === 1) {
+						var _v4 = s.g;
+						if (_v4.$ === 1) {
 							return _Utils_Tuple2(
 								$author$project$Main$InSession(
 									_Utils_update(
@@ -6112,14 +6169,14 @@ var $author$project$Main$update = F2(
 								$elm$core$Platform$Cmd$none);
 						}
 					});
-			case 10:
+			case 12:
 				return A2(
 					$author$project$Main$withSession,
 					model,
 					function (s) {
-						var _v4 = s.g;
-						if (_v4.$ === 1) {
-							var raw = _v4.a;
+						var _v5 = s.g;
+						if (_v5.$ === 1) {
+							var raw = _v5.a;
 							var answer = $elm$core$String$trim(raw);
 							if (answer === '') {
 								return _Utils_Tuple2(
@@ -6136,11 +6193,16 @@ var $author$project$Main$update = F2(
 										s,
 										{
 											g: $author$project$Main$ListenVerdict(
-												{ae: answer, ax: good})
+												{ag: answer, az: good})
 										}));
 								return _Utils_Tuple2(
 									$author$project$Main$InSession(s2),
-									$author$project$Main$focus($author$project$Main$nextButtonId));
+									$elm$core$Platform$Cmd$batch(
+										_List_fromArray(
+											[
+												$author$project$Main$focus($author$project$Main$nextButtonId),
+												$author$project$Main$now($author$project$Main$GotAnswerTime)
+											])));
 							}
 						} else {
 							return _Utils_Tuple2(
@@ -6148,7 +6210,7 @@ var $author$project$Main$update = F2(
 								$elm$core$Platform$Cmd$none);
 						}
 					});
-			case 11:
+			case 13:
 				return A2(
 					$author$project$Main$withSession,
 					model,
@@ -6158,36 +6220,41 @@ var $author$project$Main$update = F2(
 							$author$project$Main$playAudio(
 								$author$project$Main$mp3Url(s.r)));
 					});
-			case 12:
+			case 14:
 				return A2($author$project$Main$withSession, model, $author$project$Main$advance);
-			case 13:
+			case 15:
 				return A2(
 					$author$project$Main$withSession,
 					model,
 					function (s) {
-						var _v5 = s.g;
-						if (_v5.$ === 3) {
+						var _v6 = s.g;
+						if (_v6.$ === 3) {
 							return _Utils_Tuple2(
 								$author$project$Main$InSession(
 									_Utils_update(
 										s,
 										{g: $author$project$Main$SpeakEvaluating})),
-								$author$project$Main$playAudio(
-									$author$project$Main$mp3Url(s.r)));
+								$elm$core$Platform$Cmd$batch(
+									_List_fromArray(
+										[
+											$author$project$Main$playAudio(
+											$author$project$Main$mp3Url(s.r)),
+											$author$project$Main$now($author$project$Main$GotAnswerTime)
+										])));
 						} else {
 							return _Utils_Tuple2(
 								$author$project$Main$InSession(s),
 								$elm$core$Platform$Cmd$none);
 						}
 					});
-			case 14:
+			case 16:
 				var good = msg.a;
 				return A2(
 					$author$project$Main$withSession,
 					model,
 					function (s) {
-						var _v6 = s.g;
-						if (_v6.$ === 4) {
+						var _v7 = s.g;
+						if (_v7.$ === 4) {
 							return $author$project$Main$advance(
 								A2($author$project$Main$tally, good, s));
 						} else {
@@ -6196,13 +6263,13 @@ var $author$project$Main$update = F2(
 								$elm$core$Platform$Cmd$none);
 						}
 					});
-			case 15:
-				var _v7 = model.q;
-				if (_v7.$ === 2) {
-					var s = _v7.a;
+			case 17:
+				var _v8 = model.q;
+				if (_v8.$ === 2) {
+					var s = _v8.a;
 					var fresh = _Utils_update(
 						s,
-						{f: 0, g: $author$project$Main$Loading, n: 0});
+						{D: _List_Nil, f: 0, g: $author$project$Main$Loading, I: $elm$core$Maybe$Nothing, n: 0});
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -6230,13 +6297,27 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Main$ChangeSettingsClicked = {$: 16};
-var $author$project$Main$RestartClicked = {$: 15};
+var $author$project$Main$ChangeSettingsClicked = {$: 18};
+var $author$project$Main$RestartClicked = {$: 17};
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$accuracyText = function (s) {
 	var total = s.f + s.n;
 	return (!total) ? '' : ('Accuracy: ' + ($elm$core$String$fromInt(
 		$elm$core$Basics$round((100 * s.f) / total)) + '%'));
+};
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $author$project$Main$averageTimeText = function (s) {
+	var _v0 = s.D;
+	if (!_v0.b) {
+		return '';
+	} else {
+		var times = _v0;
+		var tenths = $elm$core$Basics$round(
+			($elm$core$List$sum(times) / $elm$core$List$length(times)) / 100);
+		return 'Average time per answer: ' + ($elm$core$String$fromInt((tenths / 10) | 0) + ('.' + ($elm$core$String$fromInt(tenths % 10) + ' s')));
+	}
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
@@ -6295,6 +6376,14 @@ var $author$project$Main$viewResults = function (s) {
 					$author$project$Main$accuracyText(s))
 				])),
 			A2(
+			$elm$html$Html$p,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$author$project$Main$averageTimeText(s))
+				])),
+			A2(
 			$elm$html$Html$div,
 			_List_Nil,
 			_List_fromArray(
@@ -6330,7 +6419,7 @@ var $author$project$Main$modeName = function (mode) {
 	}
 };
 var $author$project$Main$progressText = function (s) {
-	var prefix = $author$project$Main$modeName(s.m) + (' · ' + ($elm$core$String$fromInt(s.S) + ('–' + ($elm$core$String$fromInt(s.R) + ' · '))));
+	var prefix = $author$project$Main$modeName(s.m) + (' · ' + ($elm$core$String$fromInt(s.U) + ('–' + ($elm$core$String$fromInt(s.T) + ' · '))));
 	var _v0 = s.k;
 	if (!_v0) {
 		return prefix + (('correct ' + ($elm$core$String$fromInt(s.f) + (' / ' + $elm$core$String$fromInt(s.z)))) + (' · mistakes ' + $elm$core$String$fromInt(s.n)));
@@ -6339,12 +6428,12 @@ var $author$project$Main$progressText = function (s) {
 	}
 };
 var $author$project$Main$AnswerChanged = function (a) {
-	return {$: 9, a: a};
+	return {$: 11, a: a};
 };
-var $author$project$Main$AnswerSubmitted = {$: 10};
-var $author$project$Main$NextClicked = {$: 12};
-var $author$project$Main$ReplayClicked = {$: 11};
-var $author$project$Main$RevealClicked = {$: 13};
+var $author$project$Main$AnswerSubmitted = {$: 12};
+var $author$project$Main$NextClicked = {$: 14};
+var $author$project$Main$ReplayClicked = {$: 13};
+var $author$project$Main$RevealClicked = {$: 15};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -6463,8 +6552,8 @@ var $author$project$Main$viewPhase = function (s) {
 						]))
 				]);
 		case 2:
-			var given = _v0.a.ae;
-			var wasCorrect = _v0.a.ax;
+			var given = _v0.a.ag;
+			var wasCorrect = _v0.a.az;
 			return _List_fromArray(
 				[
 					A2(
@@ -6831,7 +6920,7 @@ var $author$project$Main$viewSetup = function (form) {
 							_List_fromArray(
 								[
 									$elm$html$Html$text('from '),
-									A2($author$project$Main$numberInput, form.G, $author$project$Main$MinChanged)
+									A2($author$project$Main$numberInput, form.H, $author$project$Main$MinChanged)
 								])),
 							A2(
 							$elm$html$Html$label,
@@ -6839,7 +6928,7 @@ var $author$project$Main$viewSetup = function (form) {
 							_List_fromArray(
 								[
 									$elm$html$Html$text(' to '),
-									A2($author$project$Main$numberInput, form.F, $author$project$Main$MaxChanged)
+									A2($author$project$Main$numberInput, form.G, $author$project$Main$MaxChanged)
 								]))
 						]))
 				])),
@@ -6877,12 +6966,12 @@ var $author$project$Main$viewSetup = function (form) {
 								[
 									$elm$html$Html$text(
 									$author$project$Main$goalPrompt(form.k) + ' '),
-									A2($author$project$Main$numberInput, form.K, $author$project$Main$GoalChanged)
+									A2($author$project$Main$numberInput, form.M, $author$project$Main$GoalChanged)
 								]))
 						]))
 				])),
 			function () {
-			var _v0 = form.Q;
+			var _v0 = form.S;
 			if (!_v0.$) {
 				var err = _v0.a;
 				return A2(
@@ -6922,7 +7011,7 @@ var $author$project$Main$view = function (model) {
 			var _v0 = model.q;
 			switch (_v0.$) {
 				case 0:
-					return $author$project$Main$viewSetup(model.E);
+					return $author$project$Main$viewSetup(model.F);
 				case 1:
 					var s = _v0.a;
 					return $author$project$Main$viewSession(s);
@@ -6934,12 +7023,12 @@ var $author$project$Main$view = function (model) {
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{
-		aK: function (_v0) {
+		aM: function (_v0) {
 			return _Utils_Tuple2($author$project$Main$initModel, $elm$core$Platform$Cmd$none);
 		},
-		aQ: $author$project$Main$subscriptions,
-		aS: $author$project$Main$update,
-		aT: $author$project$Main$view
+		aS: $author$project$Main$subscriptions,
+		aU: $author$project$Main$update,
+		aV: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

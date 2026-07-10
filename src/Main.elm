@@ -489,10 +489,10 @@ viewSetup form =
         [ h2 [] [ text "Session goal" ]
         , choiceButton (form.goalKind == ReachCorrect)
             (GoalKindChosen ReachCorrect)
-            "Reach N correct answers (mistakes are counted)"
+            "Reach N correct answers"
         , choiceButton (form.goalKind == FixedAttempts)
             (GoalKindChosen FixedAttempts)
-            "Do N attempts (correct answers are counted)"
+            "Do N attempts"
         , div [] [ label [] [ text (goalPrompt form.goalKind ++ " "), numberInput form.goalInput GoalChanged ] ]
         ]
     , case form.error of

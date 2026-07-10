@@ -17,15 +17,14 @@
 --   listen - play a random number's mp3, ask you to type the number, then
 --            show the verdict on the answer line (green tick, or red cross
 --            with the correct answer).
--- Loops until Ctrl+C. Run from the directory containing 0.mp3 .. 9999.mp3
--- (or it falls back to the script's own directory).
+-- Loops until Ctrl+C. Plays mp3s from ./audio (or falls back to the audio
+-- directory next to the script itself).
 
 module Main (main) where
 
 import Control.Exception (AsyncException (UserInterrupt), catch, throwIO)
 import Control.Monad (forever, when)
 import Data.Char (isDigit)
-import Data.List (isSuffixOf)
 import System.Console.ANSI
     ( Color (Green, Red)
     , ColorIntensity (Dull)
@@ -35,7 +34,7 @@ import System.Console.ANSI
     , setCursorColumn
     , setSGR
     )
-import System.Directory (listDirectory)
+import System.Directory (doesDirectoryExist)
 import System.Environment (getArgs)
 import System.Exit (exitFailure, exitSuccess)
 import System.FilePath (takeDirectory, (<.>), (</>))
@@ -96,12 +95,12 @@ usage = do
     hPutStrLn stderr "Usage: drill.hs speak|listen LIMIT"
     exitFailure
 
--- Play files from the current directory; if there are no mp3s here, fall
--- back to the directory the script itself lives in.
+-- Play files from ./audio; if it doesn't exist, fall back to the audio
+-- directory next to the script itself.
 findMp3Dir :: IO FilePath
 findMp3Dir = do
-    files <- listDirectory "."
-    pure $ if any (".mp3" `isSuffixOf`) files then "." else takeDirectory __FILE__
+    hereExists <- doesDirectoryExist "audio"
+    pure $ if hereExists then "audio" else takeDirectory __FILE__ </> "audio"
 
 oneRound :: FilePath -> Mode -> Int -> IO ()
 oneRound dir mode limit = do

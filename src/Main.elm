@@ -128,6 +128,7 @@ type Msg
     | SelfEvaluated Bool
       -- results screen
     | RestartClicked
+      -- back to setup (results screen, exit button in session)
     | ChangeSettingsClicked
 
 
@@ -496,6 +497,7 @@ viewSession : Session -> List (Html Msg)
 viewSession s =
     p [ A.class "progress" ] [ text (progressText s) ]
         :: viewPhase s
+        ++ [ button [ A.class "quit", E.onClick ChangeSettingsClicked ] [ text "✕ Exit session" ] ]
 
 
 progressText : Session -> String

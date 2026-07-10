@@ -6642,7 +6642,22 @@ var $author$project$Main$viewSession = function (s) {
 					$elm$html$Html$text(
 					$author$project$Main$progressText(s))
 				])),
-		$author$project$Main$viewPhase(s));
+		_Utils_ap(
+			$author$project$Main$viewPhase(s),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('quit'),
+							$elm$html$Html$Events$onClick($author$project$Main$ChangeSettingsClicked)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('✕ Exit session')
+						]))
+				])));
 };
 var $author$project$Main$FixedAttempts = 1;
 var $author$project$Main$GoalChanged = function (a) {

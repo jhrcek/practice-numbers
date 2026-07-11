@@ -457,15 +457,17 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ A.class "app" ]
-        (case model.screen of
-            Setup ->
-                viewSetup model.form
+        (styles
+            :: (case model.screen of
+                    Setup ->
+                        viewSetup model.form
 
-            InSession s ->
-                viewSession s
+                    InSession s ->
+                        viewSession s
 
-            Finished s ->
-                viewResults s
+                    Finished s ->
+                        viewResults s
+               )
         )
 
 
@@ -474,26 +476,30 @@ viewSetup form =
     [ h1 [] [ text "Portuguese number drill" ]
     , section []
         [ h2 [] [ text "Mode" ]
-        , choiceButton (form.mode == Listen) (ModeChosen Listen) "Listen — hear a number, type it"
-        , choiceButton (form.mode == Speak) (ModeChosen Speak) "Speak — see a number, say it aloud"
+        , div [ A.class "stack" ]
+            [ choiceButton (form.mode == Listen) (ModeChosen Listen) "Listen — hear a number, type it"
+            , choiceButton (form.mode == Speak) (ModeChosen Speak) "Speak — see a number, say it aloud"
+            ]
         ]
     , section []
         [ h2 [] [ text "Number range" ]
-        , div [] (List.map presetButton [ ( 0, 9 ), ( 0, 99 ), ( 0, 999 ), ( 0, 9999 ) ])
-        , div []
+        , div [ A.class "row" ] (List.map presetButton [ ( 0, 9 ), ( 0, 99 ), ( 0, 999 ), ( 0, 9999 ) ])
+        , div [ A.class "row" ]
             [ label [] [ text "from ", numberInput form.minInput MinChanged ]
             , label [] [ text " to ", numberInput form.maxInput MaxChanged ]
             ]
         ]
     , section []
         [ h2 [] [ text "Session goal" ]
-        , choiceButton (form.goalKind == ReachCorrect)
-            (GoalKindChosen ReachCorrect)
-            "Reach N correct answers"
-        , choiceButton (form.goalKind == FixedAttempts)
-            (GoalKindChosen FixedAttempts)
-            "Do N attempts"
-        , div [] [ label [] [ text (goalPrompt form.goalKind ++ " "), numberInput form.goalInput GoalChanged ] ]
+        , div [ A.class "stack" ]
+            [ choiceButton (form.goalKind == ReachCorrect)
+                (GoalKindChosen ReachCorrect)
+                "Reach N correct answers"
+            , choiceButton (form.goalKind == FixedAttempts)
+                (GoalKindChosen FixedAttempts)
+                "Do N attempts"
+            ]
+        , div [ A.class "row" ] [ label [] [ text (goalPrompt form.goalKind ++ " "), numberInput form.goalInput GoalChanged ] ]
         ]
     , case form.error of
         Just err ->
@@ -501,7 +507,7 @@ viewSetup form =
 
         Nothing ->
             text ""
-    , button [ E.onClick StartClicked ] [ text "Start" ]
+    , button [ A.class "primary start", E.onClick StartClicked ] [ text "Start" ]
     ]
 
 
@@ -522,7 +528,7 @@ choiceButton isSelected msg lbl =
 
 presetButton : ( Int, Int ) -> Html Msg
 presetButton ( lo, hi ) =
-    button [ E.onClick (PresetChosen lo hi) ]
+    button [ A.class "chip", E.onClick (PresetChosen lo hi) ]
         [ text (String.fromInt lo ++ "–" ++ String.fromInt hi) ]
 
 
@@ -579,7 +585,7 @@ viewPhase s =
 
         ListenAnswering answer ->
             [ p [] [ text "Type the number you hear:" ]
-            , div []
+            , div [ A.class "row" ]
                 [ input
                     [ A.id answerInputId
                     , A.type_ "text"
@@ -590,9 +596,9 @@ viewPhase s =
                     , onEnter AnswerSubmitted
                     ]
                     []
-                , button [ E.onClick AnswerSubmitted ] [ text "Check" ]
+                , button [ A.class "primary", E.onClick AnswerSubmitted ] [ text "Check" ]
                 ]
-            , replayRow
+            , replayRow "row"
             ]
 
         ListenVerdict { given, wasCorrect } ->
@@ -605,33 +611,34 @@ viewPhase s =
                     , span [ A.class "note" ] [ text (" — correct was " ++ String.fromInt s.current) ]
                     ]
                 )
-            , div []
+            , div [ A.class "row" ]
                 [ input [ A.type_ "text", A.value given, A.readonly True ] []
-                , button [ A.id nextButtonId, E.onClick NextClicked ] [ text "Next ⏎" ]
+                , button [ A.class "primary", A.id nextButtonId, E.onClick NextClicked ] [ text "Next ⏎" ]
                 ]
-            , replayRow
+            , replayRow "row"
             ]
 
         SpeakThinking ->
             [ p [] [ text "Say this number out loud in Portuguese:" ]
             , p [ A.class "big-number" ] [ text (String.fromInt s.current) ]
-            , div [] [ button [ A.id playButtonId, E.onClick RevealClicked ] [ text "🔊 Hear it ⏎" ] ]
+            , div [ A.class "row center" ]
+                [ button [ A.class "primary", A.id playButtonId, E.onClick RevealClicked ] [ text "🔊 Hear it ⏎" ] ]
             ]
 
         SpeakEvaluating ->
             [ p [] [ text "How did it go?" ]
             , p [ A.class "big-number" ] [ text (String.fromInt s.current) ]
-            , div []
+            , div [ A.class "row center" ]
                 [ button [ E.onClick (SelfEvaluated True) ] [ text "✓ I said it right (1)" ]
                 , button [ E.onClick (SelfEvaluated False) ] [ text "✗ I made a mistake (2)" ]
                 ]
-            , replayRow
+            , replayRow "row center"
             ]
 
 
-replayRow : Html Msg
-replayRow =
-    div [] [ button [ E.onClick ReplayClicked ] [ text "🔊 Play again" ] ]
+replayRow : String -> Html Msg
+replayRow rowClass =
+    div [ A.class rowClass ] [ button [ A.class "chip", E.onClick ReplayClicked ] [ text "🔊 Play again" ] ]
 
 
 viewResults : Session -> List (Html Msg)
@@ -640,8 +647,8 @@ viewResults s =
     , p [] [ text (summaryText s) ]
     , p [] [ text (accuracyText s) ]
     , p [] [ text (averageTimeText s) ]
-    , div []
-        [ button [ E.onClick RestartClicked ] [ text "Practice again" ]
+    , div [ A.class "row" ]
+        [ button [ A.class "primary", E.onClick RestartClicked ] [ text "Practice again" ]
         , button [ E.onClick ChangeSettingsClicked ] [ text "Change settings" ]
         ]
     ]
@@ -694,6 +701,191 @@ averageTimeText s =
                 ++ "."
                 ++ String.fromInt (remainderBy 10 tenths)
                 ++ " s"
+
+
+{-| All of the app's styling, rendered as a <style> element so that
+hover/focus states and media queries work (plain per-element inline
+styles can't express those).
+-}
+styles : Html msg
+styles =
+    Html.node "style" [] [ text css ]
+
+
+css : String
+css =
+    """
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 2.5rem 1rem;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(160deg, #eef6f1, #e9eef7);
+    color: #1f2937;
+    line-height: 1.5;
+}
+
+.app {
+    max-width: 30rem;
+    margin: 0 auto;
+    padding: 2rem 2.25rem 2.25rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(16, 60, 40, 0.10);
+}
+
+h1 {
+    font-size: 1.45rem;
+    margin: 0 0 1.25rem;
+}
+
+h2 {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b7280;
+    margin: 0 0 0.6rem;
+}
+
+section { margin: 1.5rem 0; }
+
+p { margin: 0.75rem 0; }
+
+label { color: #4b5563; }
+
+button {
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #ffffff;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+button:hover { border-color: #059669; background: #f0fdf6; }
+
+button:focus-visible, input:focus-visible {
+    outline: 2px solid #059669;
+    outline-offset: 2px;
+}
+
+button.selected {
+    border-color: #059669;
+    box-shadow: inset 0 0 0 1px #059669;
+    background: #ecfdf5;
+    color: #047857;
+    font-weight: 600;
+}
+
+button.primary {
+    background: #059669;
+    border-color: #059669;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+button.primary:hover { background: #047857; border-color: #047857; }
+
+button.chip {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.85rem;
+    border-radius: 999px;
+}
+
+button.start {
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
+}
+
+input {
+    font: inherit;
+    width: 6.5rem;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #ffffff;
+    color: inherit;
+}
+
+input:focus { border-color: #059669; }
+
+input[readonly] { background: #f3f4f6; color: #6b7280; }
+
+.stack { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.stack button { text-align: left; }
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0;
+}
+
+.row.center { justify-content: center; }
+
+.big-number {
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+    margin: 1.25rem 0;
+    color: #111827;
+}
+
+.progress {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ok { color: #059669; font-weight: 600; }
+
+.bad { color: #dc2626; font-weight: 600; }
+
+.note { color: #6b7280; }
+
+.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #b91c1c;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.8rem;
+}
+
+button.quit {
+    display: block;
+    margin: 2.5rem auto 0;
+    border: none;
+    background: none;
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+button.quit:hover { color: #dc2626; }
+
+@media (max-width: 480px) {
+    body { padding: 0; }
+
+    .app {
+        min-height: 100vh;
+        border-radius: 0;
+        padding: 1.5rem 1.25rem;
+    }
+}
+"""
 
 
 onEnter : Msg -> Html.Attribute Msg
